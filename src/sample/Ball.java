@@ -1,6 +1,5 @@
 package sample;
 
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -10,6 +9,8 @@ import org.jbox2d.dynamics.*;
 public class Ball {
     public static final float RESTITUTION = 0.75f;
     Body ballBody;
+
+    private String name;
 
     private final float ballRadius = 30f;
 
@@ -26,7 +27,8 @@ public class Ball {
     CircleShape ballShape;
     FixtureDef ballFixture;
 
-    public Ball(Game game,float ballStartX,float ballStartY,float mouseX,float mouseY,ImageView arm_view){
+    public Ball(Game game,float ballStartX,float ballStartY,float mouseX,float mouseY,ImageView arm_view,String name){
+        this.name = name;
         // Ball
         //Def
         ballDef = new BodyDef();
@@ -46,6 +48,9 @@ public class Ball {
         ballFixture.friction = 0.1f;//MAKE IT LESS SLOPPY
         //WE CAN ATTACH MULTIPLE FIXTURES TO ONE BODY , THE RESULT IS A COMPLEX SHAPE THAT HAS COMPLEX PHYSICS.
         ballFixture.userData = this;
+        //ballFixture.filter.categoryBits=0x0004;
+        //ballFixture.filter.maskBits=0x002;
+        ballFixture.filter.groupIndex=7;
         ballBody.createFixture(ballFixture); //HERE WE ATTACH THE BALL BODY ONLY TO THE BALL FIXTURE
         this.arm_view = arm_view;
         ballBody.applyLinearImpulse(new Vec2(CalculateXImpulse(mouseX),CalculateYImpulse(mouseY)),ballBody.getWorldCenter());
@@ -92,4 +97,17 @@ public class Ball {
             return imp_y;
         }
     }
+
+
+    @Override
+    public String toString() {
+
+        return this.getName();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+
 }
