@@ -21,7 +21,7 @@ public class Ball {
 
     private ImageView arm_view;
 
-    ImageView imgView =new ImageView( new Image("sample/circle.png",30,30,false,false));
+    ImageView imgView =new ImageView( new Image("Game res/bullet.png",30,30,false,false));
 
     BodyDef ballDef;
     CircleShape ballShape;
