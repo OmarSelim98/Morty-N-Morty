@@ -20,16 +20,29 @@ public class ContactListener implements org.jbox2d.callbacks.ContactListener{
     @Override
     public void beginContact(Contact contact) {
         try {
-            if (contact.isTouching()) {
+            if (contact.isEnabled()) {
                 //System.out.println("collision yabaaaaaaaa");
+                System.out.println(contact.m_fixtureB.m_userData.toString()+" | "+contact.m_fixtureB.m_userData.toString());
                 if (contact.m_fixtureB.m_userData.toString() == contact.m_fixtureA.m_userData.toString()) {
-                    System.out.println("hopa");
-                    contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(50,0),contact.m_manifold.localPoint);
+                    System.out.println(contact.m_fixtureB.m_userData.toString()+" | "+contact.m_fixtureB.m_userData.toString());
+                    game.endTimer();
                     contact.m_fixtureB.getBody().setActive(false);
                     contact.m_fixtureB.destroy();
-                    game.player2.inflictDamage(10);
+                    //Here we check the current turns , update health , apply impulse
+                    if(game.getCurrentTurn() == 1) {
+                        game.player2.inflictDamage(50);
+                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(50,0),contact.m_manifold.localPoint);
+                    }else if(game.getCurrentTurn() == 2){
+                        game.player1.inflictDamage(50);
+                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(-50,0),contact.m_manifold.localPoint);
+                    }
+                    game.decrementBalls();
                     game.changeTurn();
-
+                    game.startTimer();
+                    if(game.player1.getHealth() <= 0 || game.player2.getHealth() <= 0){
+                        game.endTimer();
+                        Main.ChangeScene(new GameMenu().getScene());
+                    }
                     //contact.getFixtureA().getUserData().equals()
                 }
             }

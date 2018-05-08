@@ -27,7 +27,7 @@ public class Ball {
     CircleShape ballShape;
     FixtureDef ballFixture;
 
-    public Ball(Game game,float ballStartX,float ballStartY,float mouseX,float mouseY,ImageView arm_view,String name){
+    public Ball(Game game,float ballStartX,float ballStartY,Vec2 impulse,ImageView arm_view,String name){
         this.name = name;
         // Ball
         //Def
@@ -38,7 +38,7 @@ public class Ball {
         ballBody = game.getWorld().createBody(ballDef);
         //Dynamic Shape
         ballShape = new CircleShape();
-        ballShape.m_p.set(0,0); // SET SHAPE'S POSITION RELATIVE TO BODY'S POSITION
+        ballShape.m_p.set(0,0); // SET SHAPE'S POSITION RELATIVE to BODY'S POSITION
         ballShape.m_radius = (ballRadius/meterToPixel)/2; //RADIUS IN METERS (30 PIXELS)
         //Fixture
         ballFixture = new FixtureDef();
@@ -53,7 +53,8 @@ public class Ball {
         ballFixture.filter.groupIndex=7;
         ballBody.createFixture(ballFixture); //HERE WE ATTACH THE BALL BODY ONLY TO THE BALL FIXTURE
         this.arm_view = arm_view;
-        ballBody.applyLinearImpulse(new Vec2(CalculateXImpulse(mouseX),CalculateYImpulse(mouseY)),ballBody.getWorldCenter());
+        System.out.println("Imp x : "+impulse);
+        ballBody.applyLinearImpulse(impulse,ballBody.getWorldCenter());
         imgView.setTranslateX(ballBody.getPosition().x*meterToPixel);
         imgView.setTranslateY(-ballBody.getPosition().y*meterToPixel);
         imgView.setCache(true);

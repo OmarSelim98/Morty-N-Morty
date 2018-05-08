@@ -1,19 +1,27 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
-
+    static Stage stage;
     public Game game;
 
 
     @Override
     public void start(Stage primaryStage){
-        game = new Game();
+        this.stage = primaryStage;
 
-        primaryStage.setScene(game.getScene());
+
+
+        primaryStage.setScene(new GameMenu().getScene());
+        primaryStage.setOnCloseRequest(e ->{
+            Platform.exit();
+            System.exit(0);
+        });
         primaryStage.show();
     }
 
@@ -22,4 +30,7 @@ public class Main extends Application {
         launch(args);
     }
 
+    public static void ChangeScene(Scene scene){
+        stage.setScene(scene);
+    }
 }

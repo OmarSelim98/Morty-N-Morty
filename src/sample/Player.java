@@ -1,6 +1,9 @@
 package sample;
 
 import javafx.beans.property.StringProperty;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Rotate;
@@ -14,31 +17,40 @@ import org.jbox2d.dynamics.contacts.Contact;
 
 public class Player  {
     Game game;
-    public static final float RESTITUTION = 0.2f;
+    public static final float RESTITUTION = 1f;
     Body playerBody;
 
     private String name;
 
     private final int meterToPixel = 30;
-
     private int health = 100;
     private final int width = 75;
     private final int height = 150;
     private final int arm_width = 16;
     private final int arm_height = 75;
     private final int arm_x = 23;
-    private final int arm_y = 60;
+    private int arm_y = 60;
     Rotate arm_rotate = new Rotate(0,arm_width/2,7);
-    ImageView imgView = new ImageView( new Image("sample/body.png",75,135,false,false));
-    ImageView armView = new ImageView(new Image("sample/arm.png",arm_width,arm_height,false,false));
+    ImageView imgView;
+    ImageView armView;
 
     BodyDef playerDef;
     PolygonShape playerShape;
     FixtureDef playerFixtureDef;
 
-    public Player(Game game, int playerStartX, int playerStartY, String name){
+    private boolean can_jump = true;
+
+    public Player(String image_url,String arm_url,Game game, int playerStartX, int playerStartY, String name){
+        imgView = new ImageView( new Image(image_url,75,135,false,false));;
+        armView =  new ImageView(new Image(arm_url,arm_width,arm_height,false,false));;
+
         this.name = name;
         this.game = game;
+
+        if(this.name.equals("player2")){
+            this.arm_y += 25;
+            arm_rotate.setPivotX(arm_rotate.getPivotX()+5);
+        }
 
         playerDef = new BodyDef();
         playerDef.position.set(playerStartX/meterToPixel,-((playerStartY)/meterToPixel));
@@ -72,6 +84,8 @@ public class Player  {
         armView.setTranslateX(imgView.getTranslateX()+arm_x);
         armView.setTranslateY(imgView.getTranslateY()+arm_y);
         armView.getTransforms().add(arm_rotate);
+
+
     }
 
 
@@ -86,7 +100,16 @@ public class Player  {
             game.root.getChildren().removeAll(this.imgView);
             game.getWorld().destroyBody(playerBody);
         }
-        //System.out.println(playerBody.getMass());
+        if(Math.abs(this.playerBody.getLinearVelocity().y) < 5) {
+
+                this.playerBody.applyLinearImpulse(new Vec2(0,-40),playerBody.getWorldCenter());
+
+        }
+        if(-this.playerBody.getPosition().y*meterToPixel < 150){
+            float placeY = 150f;
+            this.playerBody.setTransform(new Vec2(this.playerBody.getPosition().x , -placeY/meterToPixel),playerBody.getAngle());
+        }
+        //System.out.println(this.playerBody.getLinearVelocity().y);
     }
 
     public void update_arm(){
@@ -100,7 +123,7 @@ public class Player  {
 
     public void move(int moveAmount){
         playerBody.applyLinearImpulse(new Vec2(moveAmount,0),playerBody.getPosition());
-        System.out.println(playerBody.getPosition().toString());
+        //System.out.println(playerBody.getPosition().toString());
     }
 
 
@@ -119,6 +142,7 @@ public class Player  {
 
     public void inflictDamage(int damage){
         this.health-=damage;
+
     }
 
     public void setUserData(Object data){
