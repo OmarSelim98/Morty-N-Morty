@@ -31,8 +31,8 @@ public class Player  {
     private final int arm_x = 23;
     private int arm_y = 60;
     Rotate arm_rotate = new Rotate(0,arm_width/2,7);
-    ImageView imgView;
-    ImageView armView;
+    public ImageView imgView;
+    public ImageView armView;
 
     BodyDef playerDef;
     PolygonShape playerShape;

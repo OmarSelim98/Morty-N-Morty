@@ -33,7 +33,7 @@ public class PowerSlider extends Group {
         this.setTranslateX(500-150);
         this.setTranslateY(100);
     }
-    void updatePowerSlider(double width){
+    public void updatePowerSlider(double width){
         this.power.setWidth(width);
     }
 }

@@ -49,19 +49,32 @@ public class Game{
     private PowerSlider powerslider;
     static int balls_num = 0;
 
-    AudioClip wubba = new AudioClip(this.getClass().getResource("../audio/wubba.mp3").toString())
-            ,worldisreal = new AudioClip(this.getClass().getResource("../audio/worldisreal.mp3").toString())
-            ,woah = new AudioClip(this.getClass().getResource("../audio/woah.mp3").toString());
+    AudioClip wubba = new AudioClip(this.getClass().getResource("../../audio/wubba.mp3").toString())
+            ,worldisreal = new AudioClip(this.getClass().getResource("../../audio/worldisreal.mp3").toString())
+            ,woah = new AudioClip(this.getClass().getResource("../../audio/woah.mp3").toString());
     Random rnd = new Random();
     GraphicsContext gc;
     Canvas c = new Canvas();
-    Group root = new Group();
+    public Group root = new Group();
     Scene scene = new Scene(root, 1000, 800);
     Label turnLbl = new Label("Morty's Turn!");
-    Player player1,player2;
-    Healthbar healthbar1,healthbar2;
+    public Player player1,player2;
+    public Healthbar healthbar1;
+    public Healthbar healthbar2;
     //ArrayList<Ball> ballsList;
     Ball ball;
+
+    public String player1Body,
+        player1Arm,
+        player2Body,
+        player2Arm;
+
+
+
+    ImageView background;
+    ImageView ground;
+    ImageView planet1;
+    ImageView planet2;
 
 
     //Turns Stuff
@@ -84,10 +97,10 @@ public class Game{
         world.setContactListener(listener);
 
         //ballsList = new ArrayList<>();
-        ImageView background = new ImageView(new Image("Game res/bck.png"));
-        ImageView ground = new ImageView(new Image("Game res/ground.png"));
-        ImageView planet1 = new ImageView(new Image("Game res/planet1.png"));
-        ImageView planet2 = new ImageView(new Image("Game res/planet2.png"));
+        background = new ImageView(new Image("gameres/bck.png"));
+        ground = new ImageView(new Image("gameres/ground.png"));
+        planet1 = new ImageView(new Image("gameres/planet1.png"));
+        planet2 = new ImageView(new Image("gameres/planet2.png"));
         background.setTranslateX(0);
         background.setTranslateY(0);
         ground.setTranslateX(wallX);
@@ -96,15 +109,14 @@ public class Game{
         planet1.setTranslateY(150);
         planet2.setTranslateX(700);
         planet2.setTranslateY(150);
-        player1 = new Player("Game res/body.png", "Game res/arm.png",this,100,200,"player1");
-        player2 = new Player("Game res/rickBody.png", "Game res/rickGun.png",this,900,200,"player2");
-        healthbar1 = new Healthbar("Morty",player1);
-        healthbar2 = new Healthbar("Rick",player2);
+
+
+
         turnLbl.setFont(Font.font("sans",22));
         turnLbl.setTextFill(Color.WHITE);
         turnLbl.setTranslateX(400);
         turnLbl.setTranslateY(10);
-        root.getChildren().addAll(background,c,ground,planet1,planet2,player1.imgView,player1.armView,player2.imgView,player2.armView,healthbar1,healthbar2,turnLbl);
+        root.getChildren().addAll(background,c,ground,planet1,planet2,turnLbl);
 
         this.powerslider = new PowerSlider();
         //Wall
@@ -140,85 +152,9 @@ public class Game{
         gc = c.getGraphicsContext2D();
 
 
-        new AnimationTimer(){
-            int cycleCount = 0;
-            @Override
-            public void handle(long now) {
-                gc.clearRect(0, 0, 1000, 1000);
-                world.step(1f / 60f, 10, 10);
-                gc.setFill(Color.BLACK);
-                gc.fillRect(wallX, wallY, wallW, wallH);
-                gc.setStroke(Color.RED);
+        gameLoop(planet1, planet2);
 
-                gc.fillText("Current Turn " +String.valueOf(currentTurn),50,50);
-                gc.fillText("Player 1 Balls  " + String.valueOf(player1Balls),50,70);
-                gc.fillText("Player 2 Balls " +String.valueOf(player2Balls),50,90);
-                gc.fillText("Player 1 Moves " +String.valueOf(player1Moves),200,70);
-                gc.fillText("Player 2 Moves " +String.valueOf(player2Moves),200,90);
-                //Distance distance = new Distance();
-
-                changeLabel();
-
-                if (ball != null) {
-                    if (ball.ballBody.isActive()) {
-                        ball.update();
-
-                    } else {
-                        root.getChildren().removeAll(ball.imgView);
-                        world.destroyBody(ball.ballBody);
-                    }
-                }
-
-                healthbar1.UpdateHealthbar();
-                healthbar2.UpdateHealthbar();
-
-                if(planetsAnimationAngle >= 360){
-                    planetsAnimationAngle = 0;
-                }else {
-                    planetsAnimationAngle += 0.1;
-                }
-
-                planet1.setTranslateX(100+(Math.sin(planetsAnimationAngle)*25));
-                planet2.setTranslateX(670-(Math.sin(planetsAnimationAngle)*25));
-/*                    for(Ball ball : ballsList){
-                      if(ball!= null){
-                          if(ball.ballBody.isActive())
-                                ball.update();
-                          else{
-                              root.getChildren().removeAll(ball.imgView);
-                              world.destroyBody(ball.ballBody);
-                          }
-                      }
-                    }*/
-/*                for (Ball ball:
-                        ballsList) {
-                        ball.ballFixture.filter.groupIndex=-7;
-                    ball.ballFixture.filter.categoryBits=0x004;
-                    ball.ballFixture.isSensor =true;
-
-                    }*/
-
-/*                    if(player1.playerBody.getContactList().other.m_fixtureList.m_isSensor){
-                        System.out.println("player2 touched a ball");
-                    }*/
-
-
-                if (player1 != null) {
-                    player1.update();
-                    player1.update_arm();
-
-                }
-
-                if (player2 != null){
-                    player2.update();
-                    player2.update_arm();
-                }
-
-                   // System.out.println(sceneAngle);
-            }
-        }.start();
-
-            startTimer(); // Here we start the turns timer.
+        startTimer(); // Here we start the turns timer.
 
         //Action Handlers
         scene.setOnKeyPressed(event -> {
@@ -340,6 +276,88 @@ public class Game{
             this.root.getChildren().remove(this.powerslider);
         });
     }
+
+    private void gameLoop(ImageView planet1, ImageView planet2) {
+        new AnimationTimer(){
+            int cycleCount = 0;
+            @Override
+            public void handle(long now) {
+                gc.clearRect(0, 0, 1000, 1000);
+                world.step(1f / 60f, 10, 10);
+                gc.setFill(Color.BLACK);
+                gc.fillRect(wallX, wallY, wallW, wallH);
+                gc.setStroke(Color.RED);
+
+                gc.fillText("Current Turn " +String.valueOf(currentTurn),50,50);
+                gc.fillText("Player 1 Balls  " + String.valueOf(player1Balls),50,70);
+                gc.fillText("Player 2 Balls " +String.valueOf(player2Balls),50,90);
+                gc.fillText("Player 1 Moves " +String.valueOf(player1Moves),200,70);
+                gc.fillText("Player 2 Moves " +String.valueOf(player2Moves),200,90);
+                //Distance distance = new Distance();
+
+                changeLabel();
+
+                if (ball != null) {
+                    if (ball.ballBody.isActive()) {
+                        ball.update();
+
+                    } else {
+                        root.getChildren().removeAll(ball.imgView);
+                        world.destroyBody(ball.ballBody);
+                    }
+                }
+
+                healthbar1.UpdateHealthbar();
+                healthbar2.UpdateHealthbar();
+
+                if(planetsAnimationAngle >= 360){
+                    planetsAnimationAngle = 0;
+                }else {
+                    planetsAnimationAngle += 0.1;
+                }
+
+                planet1.setTranslateX(100+(Math.sin(planetsAnimationAngle)*25));
+                planet2.setTranslateX(670-(Math.sin(planetsAnimationAngle)*25));
+/*                    for(Ball ball : ballsList){
+                      if(ball!= null){
+                          if(ball.ballBody.isActive())
+                                ball.update();
+                          else{
+                              root.getChildren().removeAll(ball.imgView);
+                              world.destroyBody(ball.ballBody);
+                          }
+                      }
+                    }*/
+/*                for (Ball ball:
+                        ballsList) {
+                        ball.ballFixture.filter.groupIndex=-7;
+                    ball.ballFixture.filter.categoryBits=0x004;
+                    ball.ballFixture.isSensor =true;
+
+                    }*/
+
+/*                    if(player1.playerBody.getContactList().other.m_fixtureList.m_isSensor){
+                        System.out.println("player2 touched a ball");
+                    }*/
+
+
+                if (player1 != null) {
+                    player1.update();
+                    player1.update_arm();
+
+                }
+
+                if (player2 != null){
+                    player2.update();
+                    player2.update_arm();
+                }
+
+                   // System.out.println(sceneAngle);
+            }
+        }.start();
+    }
+
+
 
     /*private void checkTurn() {
         if(ball!=null) {

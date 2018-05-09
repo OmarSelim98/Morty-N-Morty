@@ -1,6 +1,6 @@
 package sample;
 
-import com.sun.tools.corba.se.idl.StringGen;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import org.jbox2d.callbacks.ContactImpulse;
