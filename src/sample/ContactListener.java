@@ -1,9 +1,15 @@
 package sample;
 
+import com.sun.tools.corba.se.idl.StringGen;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
+
+import javax.swing.text.html.Option;
+import java.util.Optional;
 
 public class ContactListener implements org.jbox2d.callbacks.ContactListener{
 
@@ -35,13 +41,19 @@ public class ContactListener implements org.jbox2d.callbacks.ContactListener{
                     }else if(game.getCurrentTurn() == 2){
                         game.player1.inflictDamage(50);
                         contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(-50,0),contact.m_manifold.localPoint);
+                        game.woah.play();
                     }
                     game.decrementBalls();
                     game.changeTurn();
                     game.startTimer();
-                    if(game.player1.getHealth() <= 0 || game.player2.getHealth() <= 0){
+                    if(game.player1.getHealth() <= 0 ){
                         game.endTimer();
-                        Main.ChangeScene(new GameMenu().getScene());
+                        Main.ChangeScene(new GameMenu().getScene(),"Morty");
+                        game.stopAudio();
+                    }else if(game.player2.getHealth() <= 0){
+                        game.endTimer();
+                        Main.ChangeScene(new GameMenu().getScene(),"Rick");
+                        game.stopAudio();
                     }
                     //contact.getFixtureA().getUserData().equals()
                 }
@@ -64,6 +76,10 @@ public class ContactListener implements org.jbox2d.callbacks.ContactListener{
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
+
+    }
+
+    private void endGameText(String playerName){
 
     }
 }

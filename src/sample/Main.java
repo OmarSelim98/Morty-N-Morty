@@ -33,4 +33,8 @@ public class Main extends Application {
     public static void ChangeScene(Scene scene){
         stage.setScene(scene);
     }
+    public static void ChangeScene(Scene scene,String name){
+        stage.setScene(scene);
+
+    }
 }

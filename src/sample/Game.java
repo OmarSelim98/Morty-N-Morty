@@ -9,12 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +29,7 @@ public class Game{
             ,wallY = 600
             ,wallW = 1000
             ,wallH = 400;
+            private double planetsAnimationAngle = 0;
     private double mouseX
             ,mouseY
             ,mouseSceneX = 0 //For Angle Calculations
@@ -46,6 +49,10 @@ public class Game{
     private PowerSlider powerslider;
     static int balls_num = 0;
 
+    AudioClip wubba = new AudioClip(this.getClass().getResource("../audio/wubba.mp3").toString())
+            ,worldisreal = new AudioClip(this.getClass().getResource("../audio/worldisreal.mp3").toString())
+            ,woah = new AudioClip(this.getClass().getResource("../audio/woah.mp3").toString());
+    Random rnd = new Random();
     GraphicsContext gc;
     Canvas c = new Canvas();
     Group root = new Group();
@@ -79,19 +86,25 @@ public class Game{
         //ballsList = new ArrayList<>();
         ImageView background = new ImageView(new Image("Game res/bck.png"));
         ImageView ground = new ImageView(new Image("Game res/ground.png"));
+        ImageView planet1 = new ImageView(new Image("Game res/planet1.png"));
+        ImageView planet2 = new ImageView(new Image("Game res/planet2.png"));
         background.setTranslateX(0);
         background.setTranslateY(0);
         ground.setTranslateX(wallX);
         ground.setTranslateY(wallY);
+        planet1.setTranslateX(100);
+        planet1.setTranslateY(150);
+        planet2.setTranslateX(700);
+        planet2.setTranslateY(150);
         player1 = new Player("Game res/body.png", "Game res/arm.png",this,100,200,"player1");
-        player2 = new Player("Game res/rickBody.png", "Game res/rickGun.png",this,800,200,"player2");
+        player2 = new Player("Game res/rickBody.png", "Game res/rickGun.png",this,900,200,"player2");
         healthbar1 = new Healthbar("Morty",player1);
         healthbar2 = new Healthbar("Rick",player2);
         turnLbl.setFont(Font.font("sans",22));
         turnLbl.setTextFill(Color.WHITE);
         turnLbl.setTranslateX(400);
         turnLbl.setTranslateY(10);
-        root.getChildren().addAll(background,c,ground,player1.imgView,player1.armView,player2.imgView,player2.armView,healthbar1,healthbar2,turnLbl);
+        root.getChildren().addAll(background,c,ground,planet1,planet2,player1.imgView,player1.armView,player2.imgView,player2.armView,healthbar1,healthbar2,turnLbl);
 
         this.powerslider = new PowerSlider();
         //Wall
@@ -133,7 +146,6 @@ public class Game{
             public void handle(long now) {
                 gc.clearRect(0, 0, 1000, 1000);
                 world.step(1f / 60f, 10, 10);
-
                 gc.setFill(Color.BLACK);
                 gc.fillRect(wallX, wallY, wallW, wallH);
                 gc.setStroke(Color.RED);
@@ -160,6 +172,14 @@ public class Game{
                 healthbar1.UpdateHealthbar();
                 healthbar2.UpdateHealthbar();
 
+                if(planetsAnimationAngle >= 360){
+                    planetsAnimationAngle = 0;
+                }else {
+                    planetsAnimationAngle += 0.1;
+                }
+
+                planet1.setTranslateX(100+(Math.sin(planetsAnimationAngle)*25));
+                planet2.setTranslateX(670-(Math.sin(planetsAnimationAngle)*25));
 /*                    for(Ball ball : ballsList){
                       if(ball!= null){
                           if(ball.ballBody.isActive())
@@ -290,6 +310,13 @@ public class Game{
                     ball = new Ball(this, ballX, ballY,imp, player1.armView, "player2");
                     ball.ballBody.setUserData(ball);
                     root.getChildren().add(ball.imgView);
+                    int audiornd = rnd.nextInt(3);
+                    System.out.println(audiornd);
+                    if(audiornd == 0){
+                        //woah.play();
+                    }else if(audiornd == 1){
+
+                    }
                 } else if (this.currentTurn == 2) {
                     float ballX = (float) (player2.armView.getTranslateX() - (player2.getArmHeight() * Math.sin(Math.toRadians(sceneAngle))) - 10);
                     float ballY = (float) ((player2.armView.getTranslateY()) + (player2.getArmHeight() * Math.cos(Math.toRadians(sceneAngle))) - 10);
@@ -299,6 +326,13 @@ public class Game{
                     ball = new Ball(this, ballX, ballY, imp, player2.armView, "player1");
                     ball.ballBody.setUserData(ball);
                     root.getChildren().add(ball.imgView);
+                    int audiornd = rnd.nextInt(3);
+                    System.out.println(audiornd);
+                    if(audiornd == 0){
+                        wubba.play();
+                    }else if(audiornd == 1){
+                        worldisreal.play();
+                    }
                 }
             }
             canPlay =false;
@@ -413,5 +447,11 @@ public class Game{
         this.turnTimer.cancel();
         this.turnTimer.purge();
         System.out.println("Timer Ended");
+    }
+
+    public void stopAudio(){
+        wubba.stop();
+        worldisreal.stop();
+        woah.stop();
     }
 }
