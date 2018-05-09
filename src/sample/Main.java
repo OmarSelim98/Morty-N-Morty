@@ -47,6 +47,7 @@ public class Main extends Application {
         catch(Exception e){
             System.out.println("Error loading background music ");
         }
+
         primaryStage.show();
     }
 

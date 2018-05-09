@@ -1,19 +1,11 @@
 package sample;
 
-import javafx.beans.property.StringProperty;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Rotate;
-import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.*;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
-import org.jbox2d.dynamics.contacts.Contact;
 
 public class Player  {
     Game game;
@@ -24,10 +16,9 @@ public class Player  {
 
     private final int meterToPixel = 30;
     private int health = 100;
-    private final int width = 75;
-    private final int height = 150;
-    private final int arm_width = 16;
-    private final int arm_height = 75;
+    public static final int playerWidth = 75;
+    public static final int playerHeight = 135;
+    public static final int arm_width = 16, arm_height = 75;
     private final int arm_x = 23;
     private int arm_y = 60;
     Rotate arm_rotate = new Rotate(0,arm_width/2,7);
@@ -40,17 +31,16 @@ public class Player  {
 
     private boolean can_jump = true;
 
-    public Player(String image_url,String arm_url,Game game, int playerStartX, int playerStartY, String name){
-        imgView = new ImageView( new Image(image_url,75,135,false,false));;
-        armView =  new ImageView(new Image(arm_url,arm_width,arm_height,false,false));;
+    public Player(Image body,Image arm,Game game, int playerStartX, int playerStartY, String name){
+        imgView = new ImageView(body);;
+        armView =  new ImageView(arm);;
+
+
 
         this.name = name;
         this.game = game;
 
-        if(this.name.equals("player2")){
-            this.arm_y += 25;
-            arm_rotate.setPivotX(arm_rotate.getPivotX()+5);
-        }
+
 
         playerDef = new BodyDef();
         playerDef.position.set(playerStartX/meterToPixel,-((playerStartY)/meterToPixel));
@@ -62,7 +52,7 @@ public class Player  {
         //Dynamic Shape
         //playerShape = new;
         playerShape = new PolygonShape();
-        playerShape.setAsBox((width/meterToPixel)/2,(height/meterToPixel)/2);
+        playerShape.setAsBox((playerWidth /meterToPixel)/2,(playerHeight /meterToPixel)/2);
         //playerShape.m_radius = ballRadius/meterToPixel; //RADIUS IN METERS (30 PIXELS)
         //Fixture
 
@@ -85,13 +75,29 @@ public class Player  {
         armView.setTranslateY(imgView.getTranslateY()+arm_y);
         armView.getTransforms().add(arm_rotate);
 
-
+        if(this.name.equals("Rick")){
+            this.arm_y += 35;
+            arm_rotate.setPivotX(arm_rotate.getPivotX()+5);
+            System.out.println("Rick position : " + imgView.getTranslateX());
+            if(imgView.getTranslateX()<500){
+                imgView.setScaleX(-1);
+                this.arm_y-=65;
+                armView.setScaleY(-1);
+            }
+        }
+        if(this.name.equals("Morty")){
+            System.out.println("Morty position : " + imgView.getTranslateX());
+            if(imgView.getTranslateX()>400) {
+                imgView.setScaleX(-1);
+                armView.setScaleX(-1);
+            }
+        }
     }
 
 
     public void update(){
-        imgView.setTranslateX(playerBody.getPosition().x*meterToPixel  - (width/2));
-        imgView.setTranslateY((-(playerBody.getPosition().y*meterToPixel))-(height/2));
+        imgView.setTranslateX(playerBody.getPosition().x*meterToPixel  - (playerWidth /2));
+        imgView.setTranslateY((-(playerBody.getPosition().y*meterToPixel))-(playerHeight /2));
         if(playerBody.getPosition().y<-18){
             playerDef.position.y =-18;
         }
@@ -117,6 +123,9 @@ public class Player  {
         armView.setTranslateY(imgView.getTranslateY()+arm_y);
     }
     public void startArmRotation(double rotation){
+/*        if(name.equals("Rick")&&imgView.getTranslateX()<500){
+            arm_rotate.setAngle(-rotation);
+        }*/
         arm_rotate.setAngle(rotation);
     }
     //Getters And Setters
@@ -149,10 +158,10 @@ public class Player  {
         playerFixtureDef.userData = data;
     }
     public double getWidth(){
-        return this.width;
+        return this.playerWidth;
     }
     public double getHeight(){
-        return this.height;
+        return this.playerHeight;
     }
     public double getArmHeight(){
         return this.arm_height;

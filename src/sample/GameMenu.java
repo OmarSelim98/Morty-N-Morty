@@ -7,22 +7,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import sample.multiplayer.MultiPlayerGame;
+import sample.singleplayer.ChoosePlayerMenu;
 
 
 public class GameMenu {
-    public static final int MIN_WIDTH = 302; //AlL buttons width
-    public static final int MIN_HEIGHT = 77; // All buttons height
+    public static final int MIN_WIDTH = 302; //AlL buttons playerWidth
+    public static final int MIN_HEIGHT = 77; // All buttons playerHeight
     //invisible buttons set under image views
     private Button singlePlayer;
     private Button multiPlayer;
     private Button highScores;
     private Button exitGame;
     
-    VBox InvisibleButtons;//invisible vbox to hold all buttons
-
-
-
-
+    protected VBox InvisibleButtons;//invisible vbox to hold all buttons
 
     private Group root = new Group();// group to hold all elements in scene
     private Scene scene = new Scene(root, 1000, 721);// scene to show all components
@@ -69,8 +66,9 @@ public class GameMenu {
 
 
         Images = new VBox(30,SingleImage,MultiplayerImage,HighscoreImage,ExitImage);
+
         singlePlayer.setOnMouseClicked(event -> {
-            //Main.ChangeScene(new ChoosePlayerMenu().getScene());
+            Main.ChangeScene(new ChoosePlayerMenu().getScene());
         });
 
       multiPlayer.setOnMouseClicked(e->{

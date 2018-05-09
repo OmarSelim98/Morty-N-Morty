@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public class ContactListener implements org.jbox2d.callbacks.ContactListener{
 
+    public static final int DAMAGE = 20;
     private Game game;
     private Player player1,player2;
 
@@ -36,11 +37,11 @@ public class ContactListener implements org.jbox2d.callbacks.ContactListener{
                     contact.m_fixtureB.destroy();
                     //Here we check the current turns , update health , apply impulse
                     if(game.getCurrentTurn() == 1) {
-                        game.player2.inflictDamage(50);
-                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(50,0),contact.m_manifold.localPoint);
+                        game.player2.inflictDamage(DAMAGE);
+                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(DAMAGE,0),contact.m_manifold.localPoint);
                     }else if(game.getCurrentTurn() == 2){
-                        game.player1.inflictDamage(50);
-                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(-50,0),contact.m_manifold.localPoint);
+                        game.player1.inflictDamage(DAMAGE);
+                        contact.m_fixtureA.getBody().applyLinearImpulse(new Vec2(-DAMAGE,0),contact.m_manifold.localPoint);
                         game.woah.play();
                     }
                     game.decrementBalls();

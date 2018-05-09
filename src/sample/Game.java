@@ -64,17 +64,20 @@ public class Game{
     //ArrayList<Ball> ballsList;
     Ball ball;
 
-    public String player1Body,
+    public Image player1Body,
         player1Arm,
         player2Body,
         player2Arm;
 
+    public String player1Name = "Morty"
+            ,player2Name = "Rick";
 
 
-    ImageView background;
-    ImageView ground;
-    ImageView planet1;
-    ImageView planet2;
+
+    ImageView background
+            ,ground
+            ,planet1
+            ,planet2;
 
 
     //Turns Stuff
@@ -152,155 +155,39 @@ public class Game{
         gc = c.getGraphicsContext2D();
 
 
-        gameLoop(planet1, planet2);
 
         startTimer(); // Here we start the turns timer.
 
         //Action Handlers
-        scene.setOnKeyPressed(event -> {
-            if(event.getCode() == KeyCode.RIGHT){
-                if(currentTurn==1) {
-                    if(player1Moves>0) {
-                        player1.move(MOVE_AMOUNT);
-                        player1Moves--;
-                    }
-                }
-                if(currentTurn==2) {
-                    if(player2Moves>0) {
-                        player2.move(MOVE_AMOUNT);
-                        player2Moves--;
-                    }
-                }
-            }
-            else if(event.getCode() == KeyCode.LEFT){
-                if(currentTurn==1) {
-                    if(player1Moves>0) {
-                        player1.move(-MOVE_AMOUNT);
-                        player1Moves--;
-                    }
-                }
-                if(currentTurn==2) {
-                    if(player2Moves>0) {
-                        player2.move(-MOVE_AMOUNT);
-                        player2Moves--;
-                    }
-                }
-            }
-            if(event.getCode() == KeyCode.UP){
-                //ballBody.applyLinearImpulse(new Vec2(0,50),ballBody.getWorldCenter());
-            }
-        });
+        handlePlayerMovement();
 
-        scene.setOnMousePressed(e->{
-            this.mouseStartX = e.getSceneX();
-            this.mouseStartY = e.getSceneY();
-            if(canPlay)
-                this.root.getChildren().add(this.powerslider);
-        });
+        handleMouseClicks();
 
-        scene.setOnMouseMoved(e -> {
-            mouseSceneX = e.getSceneX();
-            mouseSceneY = e.getSceneY();
-            if (currentTurn==1) {
-                this.sceneAngle = Math.toDegrees(Math.atan2(mouseSceneY - (player1.imgView.getTranslateY()), mouseSceneX - player1.imgView.getTranslateX()) - Math.PI / 2);
-                player1.startArmRotation(sceneAngle);
-            }
-            else if(currentTurn==2){
-                this.sceneAngle = Math.toDegrees(Math.atan2(mouseSceneY - (player2.imgView.getTranslateY()), mouseSceneX - player2.imgView.getTranslateX()) - Math.PI / 2);
-                player2.startArmRotation(sceneAngle);
-            }
-            if(sceneAngle > 0){ // it breaks between 270 - 360 , as it becomes +ve
-                sceneAngle = -(360 - sceneAngle);
-            }
-        });
+        handleMouseMovement();
 
-        scene.setOnMouseDragged(e->{
-            this.mouseEndX = e.getSceneX();
-            this.mouseVarX = Math.abs(mouseEndX - mouseStartX);
-            if(this.mouseVarX >= 300){
-                this.mouseVarX = 300;
-            }else if(this.mouseVarX <= 10){
-                this.mouseVarX = 10;
-            }
-            this.powerslider.updatePowerSlider(this.mouseVarX);
-            System.out.println("Impulse power : "+this.mouseVarX);
-        });
+        handleDragging();
 
-        scene.setOnMouseReleased(event -> {
-            this.mouseEndX = event.getSceneX();
-            this.mouseEndY = event.getSceneY();
-            double impPower = this.mouseVarX/10;
-            if(impPower <= 1){
-                impPower = 1;
-            }else if(impPower >= 30){
-                impPower = 30;
-            }
-            if(canPlay) {
-                if (this.currentTurn == 1) {
-                    float ballX = (float) (player1.armView.getTranslateX() - (player1.getArmHeight() * Math.sin(Math.toRadians(sceneAngle))) + 10);
-                    float ballY = (float) ((player1.armView.getTranslateY()) + (player1.getArmHeight() * Math.cos(Math.toRadians(sceneAngle))) + 10);
-                    //System.out.println("Ball X : "+ballX+" | Ball Y : "+ballY);
-                    Vec2 imp = new Vec2((float)(Math.sin(Math.toRadians(sceneAngle))) , (float)(Math.cos(Math.toRadians(sceneAngle))));
-
-                    imp.set((float)(-imp.x*impPower),(float)(-imp.y*impPower));
-                    ball = new Ball(this, ballX, ballY,imp, player1.armView, "player2");
-                    ball.ballBody.setUserData(ball);
-                    root.getChildren().add(ball.imgView);
-                    int audiornd = rnd.nextInt(3);
-                    System.out.println(audiornd);
-                    if(audiornd == 0){
-                        //woah.play();
-                    }else if(audiornd == 1){
-
-                    }
-                } else if (this.currentTurn == 2) {
-                    float ballX = (float) (player2.armView.getTranslateX() - (player2.getArmHeight() * Math.sin(Math.toRadians(sceneAngle))) - 10);
-                    float ballY = (float) ((player2.armView.getTranslateY()) + (player2.getArmHeight() * Math.cos(Math.toRadians(sceneAngle))) - 10);
-                    //System.out.println("Ball X : "+ballX+" | Ball Y : "+ballY);
-                    Vec2 imp = new Vec2((float)(Math.sin(Math.toRadians(sceneAngle))) , (float)(Math.cos(Math.toRadians(sceneAngle))));
-                    imp.set((float)(-imp.x*(this.mouseVarX/10)),(float)(-imp.y*(this.mouseVarX/10)));
-                    ball = new Ball(this, ballX, ballY, imp, player2.armView, "player1");
-                    ball.ballBody.setUserData(ball);
-                    root.getChildren().add(ball.imgView);
-                    int audiornd = rnd.nextInt(3);
-                    System.out.println(audiornd);
-                    if(audiornd == 0){
-                        wubba.play();
-                    }else if(audiornd == 1){
-                        worldisreal.play();
-                    }
-                }
-            }
-            canPlay =false;
-            this.powerslider.updatePowerSlider(0);
-            this.root.getChildren().remove(this.powerslider);
-        });
+        handleMouseRelease();
     }
 
-    private void gameLoop(ImageView planet1, ImageView planet2) {
+
+    public void gameLoop() {
         new AnimationTimer(){
             int cycleCount = 0;
             @Override
             public void handle(long now) {
-                gc.clearRect(0, 0, 1000, 1000);
-                world.step(1f / 60f, 10, 10);
-                gc.setFill(Color.BLACK);
-                gc.fillRect(wallX, wallY, wallW, wallH);
-                gc.setStroke(Color.RED);
-
-                gc.fillText("Current Turn " +String.valueOf(currentTurn),50,50);
-                gc.fillText("Player 1 Balls  " + String.valueOf(player1Balls),50,70);
-                gc.fillText("Player 2 Balls " +String.valueOf(player2Balls),50,90);
-                gc.fillText("Player 1 Moves " +String.valueOf(player1Moves),200,70);
-                gc.fillText("Player 2 Moves " +String.valueOf(player2Moves),200,90);
-                //Distance distance = new Distance();
+                drawFrame();
 
                 changeLabel();
-
                 if (ball != null) {
                     if (ball.ballBody.isActive()) {
                         ball.update();
-
+                        if(ball.getImgView().getTranslateX()<0||ball.getImgView().getTranslateX()>1000){
+                            root.getChildren().removeAll(ball.imgView);
+                            world.destroyBody(ball.ballBody);
+                            ball=null;
+                            changeTurn();
+                        }
                     } else {
                         root.getChildren().removeAll(ball.imgView);
                         world.destroyBody(ball.ballBody);
@@ -357,6 +244,146 @@ public class Game{
         }.start();
     }
 
+    private void drawFrame() {
+        gc.clearRect(0, 0, 1000, 1000);
+        world.step(1f / 60f, 10, 10);
+        gc.setFill(Color.BLACK);
+        gc.fillRect(wallX, wallY, wallW, wallH);
+        gc.setStroke(Color.RED);
+
+        gc.fillText("Current Turn " +String.valueOf(currentTurn),50,50);
+        gc.fillText("Player 1 Balls  " + String.valueOf(player1Balls),50,70);
+        gc.fillText("Player 2 Balls " +String.valueOf(player2Balls),50,90);
+        gc.fillText("Player 1 Moves " +String.valueOf(player1Moves),200,70);
+        gc.fillText("Player 2 Moves " +String.valueOf(player2Moves),200,90);
+    }
+
+    //Action Listeners
+    private void handleMouseRelease() {
+        scene.setOnMouseReleased(event -> {
+            this.mouseEndX = event.getSceneX();
+            this.mouseEndY = event.getSceneY();
+            double impPower = this.mouseVarX/10;
+            if(impPower <= 1){
+                impPower = 1;
+            }else if(impPower >= 30){
+                impPower = 30;
+            }
+            if(canPlay) {
+                if (this.currentTurn == 1) {
+                    float ballX = (float) (player1.armView.getTranslateX() - (player1.getArmHeight() * Math.sin(Math.toRadians(sceneAngle))) + 10);
+                    float ballY = (float) ((player1.armView.getTranslateY()) + (player1.getArmHeight() * Math.cos(Math.toRadians(sceneAngle))) + 10);
+                    //System.out.println("Ball X : "+ballX+" | Ball Y : "+ballY);
+                    Vec2 imp = new Vec2((float)(Math.sin(Math.toRadians(sceneAngle))) , (float)(Math.cos(Math.toRadians(sceneAngle))));
+
+                    imp.set((float)(-imp.x*impPower),(float)(-imp.y*impPower));
+                    ball = new Ball(this, ballX, ballY,imp, player1.armView, player2Name);
+                    ball.ballBody.setUserData(ball);
+                    root.getChildren().add(ball.imgView);
+                    int audiornd = rnd.nextInt(3);
+                    System.out.println(audiornd);
+                    if(audiornd == 0){
+                        //woah.play();
+                    }else if(audiornd == 1){
+
+                    }
+                } else if (this.currentTurn == 2) {
+                    float ballX = (float) (player2.armView.getTranslateX() - (player2.getArmHeight() * Math.sin(Math.toRadians(sceneAngle))) - 10);
+                    float ballY = (float) ((player2.armView.getTranslateY()) + (player2.getArmHeight() * Math.cos(Math.toRadians(sceneAngle))) - 10);
+                    //System.out.println("Ball X : "+ballX+" | Ball Y : "+ballY);
+                    Vec2 imp = new Vec2((float)(Math.sin(Math.toRadians(sceneAngle))) , (float)(Math.cos(Math.toRadians(sceneAngle))));
+                    imp.set((float)(-imp.x*(this.mouseVarX/10)),(float)(-imp.y*(this.mouseVarX/10)));
+                    ball = new Ball(this, ballX, ballY, imp, player2.armView, player1Name);
+                    ball.ballBody.setUserData(ball);
+                    root.getChildren().add(ball.imgView);
+                    int audiornd = rnd.nextInt(3);
+                    System.out.println(audiornd);
+                    if(audiornd == 0){
+                        wubba.play();
+                    }else if(audiornd == 1){
+                        worldisreal.play();
+                    }
+                }
+            }
+            canPlay =false;
+            this.powerslider.updatePowerSlider(0);
+            this.root.getChildren().remove(this.powerslider);
+        });
+    }
+    private void handleDragging() {
+        scene.setOnMouseDragged(e->{
+            this.mouseEndX = e.getSceneX();
+            this.mouseVarX = Math.abs(mouseEndX - mouseStartX);
+            if(this.mouseVarX >= 300){
+                this.mouseVarX = 300;
+            }else if(this.mouseVarX <= 10){
+                this.mouseVarX = 10;
+            }
+            this.powerslider.updatePowerSlider(this.mouseVarX);
+            System.out.println("Impulse power : "+this.mouseVarX);
+        });
+    }
+    private void handleMouseMovement() {
+        scene.setOnMouseMoved(e -> {
+            mouseSceneX = e.getSceneX();
+            mouseSceneY = e.getSceneY();
+            if (currentTurn==1) {
+                this.sceneAngle = Math.toDegrees(Math.atan2(mouseSceneY - (player1.imgView.getTranslateY()), mouseSceneX - player1.imgView.getTranslateX()) - Math.PI / 2);
+                player1.startArmRotation(sceneAngle);
+            }
+            else if(currentTurn==2){
+                this.sceneAngle = Math.toDegrees(Math.atan2(mouseSceneY - (player2.imgView.getTranslateY()), mouseSceneX - player2.imgView.getTranslateX()) - Math.PI / 2);
+                player2.startArmRotation(sceneAngle);
+            }
+            if(sceneAngle > 0){ // it breaks between 270 - 360 , as it becomes +ve
+                sceneAngle = -(360 - sceneAngle);
+            }
+        });
+    }
+    private void handleMouseClicks() {
+        scene.setOnMousePressed(e->{
+            this.mouseStartX = e.getSceneX();
+            this.mouseStartY = e.getSceneY();
+            if(canPlay)
+                this.root.getChildren().add(this.powerslider);
+        });
+    }
+    private void handlePlayerMovement() {
+        scene.setOnKeyPressed(event -> {
+            if(event.getCode() == KeyCode.RIGHT){
+                if(currentTurn==1) {
+                    if(player1Moves>0) {
+                        player1.move(MOVE_AMOUNT);
+                        player1Moves--;
+                    }
+                }
+                if(currentTurn==2) {
+                    if(player2Moves>0) {
+                        player2.move(MOVE_AMOUNT);
+                        player2Moves--;
+                    }
+                }
+            }
+            else if(event.getCode() == KeyCode.LEFT){
+                if(currentTurn==1) {
+                    if(player1Moves>0) {
+                        player1.move(-MOVE_AMOUNT);
+                        player1Moves--;
+                    }
+                }
+                if(currentTurn==2) {
+                    if(player2Moves>0) {
+                        player2.move(-MOVE_AMOUNT);
+                        player2Moves--;
+                    }
+                }
+            }
+            if(event.getCode() == KeyCode.UP){
+                //ballBody.applyLinearImpulse(new Vec2(0,50),ballBody.getWorldCenter());
+            }
+        });
+    }
+
 
 
     /*private void checkTurn() {
@@ -385,9 +412,9 @@ public class Game{
     }
     void changeLabel(){
         if(this.currentTurn == 1){
-            this.turnLbl.setText("Morty's Turn!");
+            this.turnLbl.setText(player1Name + "'s Turn!");
         }else if(this.currentTurn ==2){
-            this.turnLbl.setText("Rick's Turn!");
+            this.turnLbl.setText(player2Name + "'s Turn!");
         }
     }
     /**
