@@ -63,6 +63,8 @@ public class Game{
     public Healthbar healthbar2;
     //ArrayList<Ball> ballsList;
     Ball ball;
+    Wall LeftWall,RightWall;
+
 
     public Image player1Body,
         player1Arm,
@@ -112,6 +114,8 @@ public class Game{
         planet1.setTranslateY(150);
         planet2.setTranslateX(700);
         planet2.setTranslateY(150);
+        LeftWall  = new Wall(world,0,0);
+        RightWall= new Wall(world,1000/meterToPixel,0);
 
 
 
@@ -481,7 +485,7 @@ public class Game{
                 startTimer();
                 this.cancel();
             }
-        },5000);
+        },6000);
 
         System.out.println("Timer Started!");
     }
@@ -499,4 +503,5 @@ public class Game{
         worldisreal.stop();
         woah.stop();
     }
+
 }
